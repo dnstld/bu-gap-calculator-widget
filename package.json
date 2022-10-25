@@ -6,6 +6,9 @@
   "author": "Denis Toledo <contato@denistoledo.com.br>",
   "license": "MIT",
   "devDependencies": {
+    "@babel/core": "^7.19.6",
+    "@babel/preset-env": "^7.19.4",
+    "babel-loader": "^8.0.0-beta.6",
     "copy-webpack-plugin": "^11.0.0",
     "uglifyjs-webpack-plugin": "^2.2.0",
     "webpack": "^5.74.0",
