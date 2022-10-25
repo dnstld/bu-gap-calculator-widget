@@ -1,16 +1,13 @@
 const path = require('path');
 const webpack = require('webpack');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+let copyWebpackPlugin = require('copy-webpack-plugin');
 const bundleOutputDir = './dist';
 
-let copyWebpackPlugin = require('copy-webpack-plugin');
-
 module.exports = (env) => {
-  const isProd = env && env.prod;
+  const isDevBuild = !(env && env.prod);
 
   return [{
-    mode: `${isProd ? 'production' : 'development'}`,
-    entry: './src/main.js',
+    entry: './src/index.js',
     output: {
       filename: 'widget.js',
       path: path.resolve(bundleOutputDir)
@@ -18,31 +15,65 @@ module.exports = (env) => {
     devServer: {
       static: bundleOutputDir
     },
+    plugins: isDevBuild
+      ? [new webpack.SourceMapDevToolPlugin(), new copyWebpackPlugin({ patterns: [{ from: 'dev/'}] })]
+      : [],
     optimization: {
-      minimizer: [new UglifyJsPlugin()],
+      minimize: !isDevBuild
     },
-    plugins: [new webpack.SourceMapDevToolPlugin(), new copyWebpackPlugin({ patterns: [{ from: 'demo/'}] })],
+    mode: isDevBuild ? 'development' : 'production',
     module: {
       rules: [
+        // packs SVG's discovered in url() into bundle
         {
-          test: /\.html$/i, use: 'html-loader'
+          test: /\.svg/,
+          use: 'svg-url-loader'
         },
         {
-          test: /\.css$/i, use: ['style-loader', 'css-loader' + isProd ? '?minimize' : '']
+          test: /\.css$/i,
+          use: [
+            {
+              loader: 'style-loader',
+              options: { injectType: 'singletonStyleTag' }
+            },
+            // allows import CSS as modules
+            {
+              loader: 'css-loader',
+              options: {
+                modules: {
+                  // css class names format
+                  localIdentName: '[name]-[local]-[hash:base64:5]'
+                },
+                sourceMap: isDevBuild
+              }
+            }
+          ]
         },
         {
-          test: /\.js$/i, exclude: /node_modules/, use: {
+          test: /\.js$/i,
+          exclude: /node_modules/,
+          use: {
             loader: 'babel-loader',
             options: {
-              presets: [['@babel/preset-env', {
-                'targets': {
-                  'browsers': ['ie 6', 'safari 7']
-                }
-              }]]
+              presets: [
+                ['@babel/preset-env', {
+                  'targets': {
+                    'ie': '11',
+                    'esmodules': true
+                  },
+                  // makes usage of @babel/polyfill because of IE11
+                  // there is at least async functions and for...of
+                  useBuiltIns: 'usage',
+                  corejs: '3.0.0'
+                }]
+              ]
             }
           }
         }
       ]
+    },
+    resolve: {
+      extensions: ['*', '.js']
     }
   }]
 }

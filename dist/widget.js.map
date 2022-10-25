@@ -1,0 +1,1 @@
+{"version":3,"file":"widget.js","mappings":"mBAGEA,QAAQC,IAAI,qB","sources":["webpack://bu-gap-calculator-widget/./src/index.ts"],"sourcesContent":["import { ping } from './services';\n\nfunction app() {\n  console.log('JS-Widget starting');\n}\n\napp();"],"names":["console","log"],"sourceRoot":""}
