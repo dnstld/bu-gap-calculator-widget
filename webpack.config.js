@@ -1,10 +1,13 @@
 const path = require('path');
 const webpack = require('webpack');
-let copyWebpackPlugin = require('copy-webpack-plugin');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const bundleOutputDir = './dist';
+
+let copyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = (env) => {
   return [{
+    mode: `${env && env.prod ? 'production' : 'development'}`,
     entry: './src/main.js',
     output: {
       filename: 'widget.js',
@@ -13,11 +16,9 @@ module.exports = (env) => {
     devServer: {
       static: bundleOutputDir
     },
-    plugins: [
-      new webpack.SourceMapDevToolPlugin(),
-      new copyWebpackPlugin({
-        patterns: [{ from: 'demo/'}]
-      })
-    ]
+    optimization: {
+      minimizer: [new UglifyJsPlugin()],
+    },
+    plugins: [new webpack.SourceMapDevToolPlugin(), new copyWebpackPlugin({ patterns: [{ from: 'demo/'}] })]
   }]
 }
