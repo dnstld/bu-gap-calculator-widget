@@ -4,5 +4,10 @@
   "main": "index.js",
   "repository": "git@github.com:dnstld/bu-gap-calculator-widget.git",
   "author": "Denis Toledo <contato@denistoledo.com.br>",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "copy-webpack-plugin": "^11.0.0",
+    "webpack": "^5.74.0",
+    "webpack-dev-server": "^4.11.1"
+  }
 }
